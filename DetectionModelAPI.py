@@ -4,6 +4,7 @@ from threading import Thread
 from datetime import datetime, time
 import time
 import schedule
+import rospy
 from DamageDetection import DamageDetectionModel
 from Drone import DroneControll
 from flask_cors import CORS, cross_origin

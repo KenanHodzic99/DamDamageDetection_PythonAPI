@@ -27,7 +27,7 @@ class DroneControll:
         the_connection.wait_heartbeat()
         print('Heartbeat from system (system %u component %u)' % (the_connection.target_system, the_connection.target_component))
 
-        video = cv2.VideoWriter('Test' + datetime.datetime.now().strftime("%d-%m-%Y")  + '.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 30, (640, 480))
+        video = cv2.VideoWriter('Footage/DamScan' + datetime.datetime.now().strftime("%d-%m-%Y")  + '.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 30, (640, 480))
 
         bridge = CvBridge()
         def image_callback(msg):
@@ -37,9 +37,9 @@ class DroneControll:
                 print(e)
             else:
                 video.write(cv2_img)
-        rospy.init_node('camera_controller')
-        image_topic = '/webcam/image_raw'
+        rospy.init_node('camera_controller', disable_signals=True)
         rospy.Rate(30)
+        image_topic = '/webcam/image_raw'
         rospy.Subscriber(image_topic, Image, image_callback)
 
 
@@ -138,4 +138,5 @@ class DroneControll:
 
         vehicle.mode = VehicleMode('LAND')
         video.release()
+        rospy.signal_shutdown("Flight ended.")
         vehicle.close()

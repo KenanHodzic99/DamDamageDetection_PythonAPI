@@ -74,9 +74,8 @@ class DamageDetectionModel:
 
         reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=3, min_lr=1.0e-15)
         
-        with tf.device('/gpu:0'):
-            history = self.model.fit(x=train_batches, validation_data=valid_batches, epochs=1, verbose=2, callbacks=[reduce_lr])
-            db_model.accuracy = history.history['accuracy'][0]
+        history = self.model.fit(x=train_batches, validation_data=valid_batches, epochs=1, verbose=2, callbacks=[reduce_lr])
+        db_model.accuracy = history.history['accuracy'][0]
         
         db_model.filename = 'damageDetectionModel-' + datetime.today().strftime(r"%d-%m-%Y")
         self.model.save('Data/saved_model/' + db_model.filename, save_format='tf')
