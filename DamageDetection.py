@@ -108,7 +108,7 @@ class DamageDetectionModel:
             success,image = vidcap.read()
             if(success):
                 image_uuid = str(uuid.uuid4())
-                cv2.imwrite( 'Footage/Images/Sector' + str(round((count * 0.234) / 10)) + "_" + image_uuid + ".jpg", image) #0.234 calculated m/s drone speed
+                cv2.imwrite( 'Footage/Images/Sector' + str(count) + "_" + image_uuid + ".jpg", image)
                 count = count + 1
 
     def getScanAmount(self):
