@@ -21,7 +21,7 @@ mydb = MySQL(app)
 cors = CORS(app)
 
 damageDetectionModel = DamageDetectionModel()
-droneControll = DroneControll(100,120)
+droneControll = DroneControll(15,90)
 
 flightCancelled = False
 job = None
