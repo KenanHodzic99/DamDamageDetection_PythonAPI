@@ -39,10 +39,10 @@ class Scan:
 class DamageDetectionModel:
     img_width=256
     img_height=256
-    train_path = 'Data\\train'
-    valid_path = 'Data\\valid'
-    test_path_ml = 'Data\\test'
-    test_path = 'Footage\\Images'
+    train_path = 'Data/train'
+    valid_path = 'Data/valid'
+    test_path_ml = 'Data/test'
+    test_path = 'Footage/Images'
     model_name = 'damageDetectionModel'
     model = None
 
@@ -51,7 +51,7 @@ class DamageDetectionModel:
 
     
     def loadModel(self, modelName):
-        self.model = keras.models.load_model('Data\\saved_model\\' + modelName)
+        self.model = keras.models.load_model('Data/saved_model/' + modelName)
         self.model.compile(optimizer=Adam(learning_rate=0.0000001), loss='binary_crossentropy', metrics=['accuracy'])
 
     
@@ -59,7 +59,7 @@ class DamageDetectionModel:
         cursor.execute('''SELECT filename FROM categorized_img WHERE threat_level_id != 0 AND addressed = true;''')
         files_to_move = cursor.fetchall()
         for file_path in files_to_move:
-            shutil.move('Data\\Cracked\\' + file_path[0], 'Data\\train\\cracked')
+            shutil.move('Data/Cracked/' + file_path[0], 'Data/train/cracked')
         cursor.execute('''DELETE FROM categorized_img WHERE threat_level_id != 0 AND addressed = true;''')
 
     
@@ -100,7 +100,7 @@ class DamageDetectionModel:
     
     def scanVideo(self, videoName):
         count = 0
-        vidcap = cv2.VideoCapture('Footage\\' + videoName)
+        vidcap = cv2.VideoCapture('Footage/' + videoName)
         success,image = vidcap.read()
         success = True
         while success:
@@ -108,7 +108,7 @@ class DamageDetectionModel:
             success,image = vidcap.read()
             if(success):
                 image_uuid = str(uuid.uuid4())
-                cv2.imwrite( 'Footage\\Images\\Sector' + str(round((count * 0.234) / 10)) + "_" + image_uuid + ".jpg", image) #0.234 calculated m/s drone speed
+                cv2.imwrite( 'Footage/Images/Sector' + str(round((count * 0.234) / 10)) + "_" + image_uuid + ".jpg", image) #0.234 calculated m/s drone speed
                 count = count + 1
 
     def getScanAmount(self):
@@ -125,26 +125,26 @@ class DamageDetectionModel:
         for file_path in os.listdir('Footage'):
             if os.path.isfile(os.path.join('Footage', file_path)):
                self.scanVideo(file_path)
-               os.remove('Footage\\' + file_path)
-        for file_path in os.listdir('Footage\\Images'):
-            if os.path.isfile(os.path.join('Footage\\Images', file_path)):
+               os.remove('Footage/' + file_path)
+        for file_path in os.listdir('Footage/Images'):
+            if os.path.isfile(os.path.join('Footage/Images', file_path)):
                 scan.scanned = scan.scanned + 1
-                img = image.load_img('Footage\\Images\\' + file_path, target_size=(self.img_width, self.img_height))
+                img = image.load_img('Footage/Images/' + file_path, target_size=(self.img_width, self.img_height))
                 x = image.img_to_array(img)
                 x = np.expand_dims(x, axis=0)
                 images = np.vstack([x])
                 classes = self.model.predict(images)
                 if(classes[0][0] > classes[0][1]):
-                    shutil.move('Footage\\Images\\' + file_path, 'Data\\Cracked')
+                    shutil.move('Footage/Images/' + file_path, 'Data/Cracked')
                     image_base64 = None
-                    with open("Data\\Cracked\\" + file_path, "rb") as image_file:
+                    with open("Data/Cracked/" + file_path, "rb") as image_file:
                         image_base64 = base64.b64encode(image_file.read())
                     splitString = file_path.split('_')[0]
                     sector = splitString.split('r')[1]
                     cursor.execute('''INSERT INTO categorized_img(filename, img, sector) VALUES ('{0}', '{1}', {2});'''.format(file_path, "data:image/jpg;base64, " + image_base64.decode('utf-8'), int(sector)))
                     scan.cracked = scan.cracked + 1
                 else:
-                    shutil.move('Footage\\Images\\' + file_path, 'Data\\Non-cracked')
+                    shutil.move('Footage/Images/' + file_path, 'Data/Non-cracked')
                     scan.non_cracked = scan.non_cracked + 1
         cursor.execute('''INSERT INTO scan(date, model_id, scanned, cracked, non_cracked) VALUES ('{0}', {1}, {2}, {3}, {4})'''.format(scan.date.strftime(r"%Y-%m-%d %H:%M:%S"), scan.model_id, scan.scanned, scan.cracked, scan.non_cracked))
     
