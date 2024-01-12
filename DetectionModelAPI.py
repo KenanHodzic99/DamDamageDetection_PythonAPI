@@ -129,6 +129,6 @@ def retrain_model(model_filename):
 
 
 if __name__ == "__main__":
-    app.run(host="localhost", port=int("5000"))
+    app.run(host="192.168.0.25", port=int("5000"))
 
 
